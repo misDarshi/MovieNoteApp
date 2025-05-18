@@ -58,7 +58,8 @@ def fetch_movie_details(movie_name: str):
                 "year": data.get("Year", ""),
                 "director": data.get("Director", ""),
                 "actors": data.get("Actors", ""),
-                "poster": data.get("Poster", "") if data.get("Poster") != "N/A" else ""
+                "poster": data.get("Poster", "") if data.get("Poster") != "N/A" else "",
+                "notes": None  # Initialize notes field as None
             }
         else:
             return {"error": data.get("Error", "Unknown error from OMDb")}
@@ -200,6 +201,33 @@ def mark_watched_guest(movie_name: str):
         return result
         
     return {"message": "Marked as watched", "movie": result}
+
+@app.put("/update_movie_notes/")
+def update_movie_notes_endpoint(
+    movie_name: str,
+    notes: str,
+    current_user: User = Depends(get_current_active_user)
+):
+    """Update notes for a movie for the current user"""
+    from user_db import update_user_movie
+    update_data = {"notes": notes}
+    result = update_user_movie(current_user.id, movie_name, update_data)
+    
+    if "error" in result:
+        return result
+        
+    return {"message": "Notes updated successfully", "movie": result}
+
+@app.put("/update_movie_notes_guest/")
+def update_movie_notes_guest(movie_name: str, notes: str):
+    """Update notes for a movie without user authentication"""
+    update_data = {"notes": notes}
+    result = update_movie(movie_name, update_data)
+    
+    if "error" in result:
+        return result
+        
+    return {"message": "Notes updated successfully", "movie": result}
 
 @app.delete("/delete_movie/")
 def delete_movie_endpoint(

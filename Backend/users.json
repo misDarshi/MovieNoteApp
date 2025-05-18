@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "id": "58adee60-c063-472b-a6e2-7113d793f495",
+    "email": "test@example.com",
+    "username": "testuser",
+    "hashed_password": "$2b$12$/uw3LoHnwVlEmHKME6VA6.pvNgB7g73o/hHIDIiRN3k7IlOLkU11u",
+    "created_at": "2025-05-18T17:55:55.917188"
+  },
+  {
+    "id": "ee169b0c-8e38-4073-8c6d-5ce1db53991c",
+    "email": "mishradarshika47@gmail.com",
+    "username": "ooye_darshii",
+    "hashed_password": "$2b$12$KIKhJ0HmFc2s7SerpvExIOnw4WsZcPQ3t/Rtvi5avTOJacGq5futy",
+    "created_at": "2025-05-18T17:57:41.899047"
+  }
+]
