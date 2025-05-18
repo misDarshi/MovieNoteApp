@@ -14,8 +14,10 @@ I built this app because I kept forgetting which movies I wanted to watch. Sound
 - **User accounts**: Create an account to save your movies across devices
 - **Guest mode**: Just want to try it out? Use the app without signing up
 - **Watched status**: Mark movies as watched/unwatched
+- **Notes**: Add personal notes about each movie
+- **Dark mode**: Because everything needs a dark mode!
 
-## Current limitations we're working on
+## Current limitations I'm working on
 
 - **Search results**: Sometimes the search can be a bit finicky - I'm improving this
 - **Movie details**: Currently shows basic info, but I want to add more details like director, runtime, etc.
@@ -26,10 +28,8 @@ I built this app because I kept forgetting which movies I wanted to watch. Sound
 ## What's coming next
 
 - **Ratings**: Add your own ratings to movies you've watched
-- **Notes**: Add personal notes about each movie
 - **Better recommendations**: Smarter movie recommendations based on your taste
 - **Social features**: Share your watchlist with friends
-- **Dark mode**: Because everything needs a dark mode!
 
 ## Tech under the hood
 
