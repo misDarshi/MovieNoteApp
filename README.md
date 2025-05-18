@@ -13,18 +13,18 @@ I built this app because I kept forgetting which movies I wanted to watch. Sound
 - **Genre filtering**: Filter your movies by genre when your list gets too long
 - **User accounts**: Create an account to save your movies across devices
 - **Guest mode**: Just want to try it out? Use the app without signing up
+- **Watched status**: Mark movies as watched/unwatched
 
 ## Current limitations we're working on
 
-- **Search results**: Sometimes the search can be a bit finicky - we're improving this
-- **Movie details**: Currently shows basic info, but we want to add more details like director, runtime, etc.
-- **Performance**: The app can be slow when adding movies - we're optimizing this
+- **Search results**: Sometimes the search can be a bit finicky - I'm improving this
+- **Movie details**: Currently shows basic info, but I want to add more details like director, runtime, etc.
+- **Performance**: The app can be slow when adding movies - I'll optimize it with time.
 - **Mobile view**: Works on mobile but needs better responsive design
 - **Error handling**: Sometimes errors aren't clearly explained to users
 
 ## What's coming next
 
-- **Watched status**: Mark movies as watched/unwatched
 - **Ratings**: Add your own ratings to movies you've watched
 - **Notes**: Add personal notes about each movie
 - **Better recommendations**: Smarter movie recommendations based on your taste
