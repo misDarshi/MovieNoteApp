@@ -13,6 +13,10 @@ I built this app because I kept forgetting which movies I wanted to watch. Sound
 - **Genre filtering**: Filter your movies by genre when your list gets too long
 - **User accounts**: Create an account to save your movies across devices
 - **Guest mode**: Just want to try it out? Use the app without signing up
+- **Notes**: Add personal notes about each movie (notes persist even after page refresh)
+- **Dark/Light mode**: Toggle between dark and light themes for comfortable viewing
+- **Vague search**: Describe a movie you're thinking of, and get recommendations
+- **Movie recommendations**: Get movie suggestions based on your descriptions
 
 ## Current limitations we're working on
 
@@ -26,10 +30,9 @@ I built this app because I kept forgetting which movies I wanted to watch. Sound
 
 - **Watched status**: Mark movies as watched/unwatched
 - **Ratings**: Add your own ratings to movies you've watched
-- **Notes**: Add personal notes about each movie
-- **Better recommendations**: Smarter movie recommendations based on your taste
 - **Social features**: Share your watchlist with friends
-- **Dark mode**: Because everything needs a dark mode!
+- **Better UI**: Enhance the user interface with more artistic and creative elements
+- **Offline mode**: Access your movie list even without internet connection
 
 ## Tech under the hood
 
@@ -37,12 +40,20 @@ This is a full-stack app with:
 - Frontend: Next.js with TypeScript and Tailwind CSS
 - Backend: Python FastAPI
 - External data: OMDb API for movie info
+- Authentication: JWT-based authentication
+- Storage: File-based storage for user data and movies
 
 ## Getting it running
+
+### Prerequisites
+- Python 3.8+ with pip
+- Node.js 14+ with npm
+- bcrypt package for Python (`pip install bcrypt`)
 
 ### Backend
 ```bash
 cd Backend
+pip install -r requirements.txt  # If available, otherwise install dependencies manually
 python main.py
 ```
 
@@ -54,6 +65,15 @@ npm run dev
 ```
 
 Then visit http://localhost:3000 in your browser.
+
+## User Guide
+
+1. **Registration/Login**: Create an account or use guest mode
+2. **Adding Movies**: Search for movies by title in the "Add a Movie" section
+3. **Finding Similar Movies**: Describe a movie in the "Find Similar Movies" section
+4. **Adding Notes**: Click on a movie in your list to add personal notes
+5. **Theme Toggle**: Use the sun/moon icon in the top right to switch between light and dark modes
+6. **Filtering**: Use the genre dropdown to filter your movie list
 
 ## Want to help out?
 
