@@ -20,7 +20,7 @@ from storage import load_movies, save_movies, get_user_movies, add_movie, update
 app = FastAPI(title="Movie Notes API", 
               description="API for managing movie notes with semantic search capabilities")
 
-# Add CORS middleware
+# Enable cross-origin requests
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # In production, replace with specific origins
@@ -29,14 +29,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-OMDB_API_KEY = "42d83121"  # This matches the key in frontend/.env.local
+OMDB_API_KEY = "42d83121"  # API key for movie data
 
-# ----------------------------
-# OMDb Movie Fetch
-# ----------------------------
+# Movie data fetching
 
 def fetch_movie_details(movie_name: str):
-    print(f"📡 Requesting details for: {movie_name}")
+    print(f"Requesting details for: {movie_name}")
 
     try:
         data = get_movie_details(movie_name)
@@ -65,20 +63,14 @@ def fetch_movie_details(movie_name: str):
             return {"error": data.get("Error", "Unknown error from OMDb")}
 
     except Exception as e:
-        print(f"❌ Exception during OMDb fetch: {e}")
+        print(f"Error during OMDb fetch: {e}")
         return {"error": str(e)}
 
-# ----------------------------
-# API Routes
-# ----------------------------
-
-# ----------------------------
-# Authentication Routes
-# ----------------------------
+# Authentication endpoints
 
 @app.post("/register", response_model=Dict[str, Any])
 def register_user(user: UserCreate):
-    """Register a new user"""
+    """Create a new user account"""
     result = create_user(user.email, user.username, user.password)
     if "error" in result:
         raise HTTPException(
@@ -89,7 +81,7 @@ def register_user(user: UserCreate):
 
 @app.post("/token", response_model=Token)
 def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
-    """Login and get access token"""
+    """Authenticate user and provide access token"""
     user = authenticate_user(form_data.username, form_data.password)
     if not user:
         raise HTTPException(
@@ -107,19 +99,17 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
 
 @app.get("/users/me", response_model=User)
 def read_users_me(current_user: User = Depends(get_current_active_user)):
-    """Get current user information"""
+    """Get logged-in user profile"""
     return current_user
 
-# ----------------------------
-# Movie Routes
-# ----------------------------
+# Movie management endpoints
 
 @app.post("/add_movie/")
 def add_movie_endpoint(
     movie_name: str,
     current_user: User = Depends(get_current_active_user)
 ):
-    """Add a movie for the current user"""
+    """Add a movie to user's collection"""
     try:
         movie_data = fetch_movie_details(movie_name)
 
@@ -138,12 +128,12 @@ def add_movie_endpoint(
         return {"error": "Movie not found!"}
 
     except Exception as e:
-        print(f"🔥 ERROR in add_movie: {e}")
+        print(f"ERROR in add_movie: {e}")
         return {"error": str(e)}
 
 @app.post("/add_movie_guest/")
 def add_movie_guest(movie_name: str):
-    """Add a movie without user authentication"""
+    """Add a movie for non-logged in users"""
     try:
         movie_data = fetch_movie_details(movie_name)
 
@@ -161,18 +151,18 @@ def add_movie_guest(movie_name: str):
         return {"error": "Movie not found!"}
 
     except Exception as e:
-        print(f"🔥 ERROR in add_movie_guest: {e}")
+        print(f"ERROR in add_movie_guest: {e}")
         return {"error": str(e)}
 
 @app.get("/movies/", response_model=List[Dict[str, Any]])
 def get_movies_endpoint(current_user: User = Depends(get_current_active_user)):
-    """Get movies for the current user"""
+    """Retrieve user's movie collection"""
     from user_db import get_user_movies
     return get_user_movies(current_user.id)
 
 @app.get("/movies_guest/", response_model=List[Dict[str, Any]])
 def get_movies_guest():
-    """Get movies without user authentication"""
+    """Get movies for non-logged in users"""
     all_movies = load_movies()
     return [movie for movie in all_movies if not movie.get("user_id")]
 
@@ -281,16 +271,11 @@ def search_movie(query: str):
 @app.get("/recommend/")
 def recommend(query: str = Query(..., description="Vague movie description or idea"), 
               top_k: int = Query(5, description="Number of recommendations to return")):
-    """
-    Get movie recommendations based on a vague description
-    
-    This endpoint uses external APIs to find movies that match the description.
-    """
+    """Find movies based on a description or theme"""
     print(f"Searching external APIs for: {query}")
     
-    # Search for movies by description using OMDb API
     external_results = search_by_description(query, count=top_k)
-    print(f"External search results: {[r['title'] for r in external_results] if external_results else 'None'}")
+    print(f"Found: {[r['title'] for r in external_results] if external_results else 'None'}")
     
     if external_results:
         # Return the external results directly without saving to database
@@ -304,11 +289,7 @@ def recommend(query: str = Query(..., description="Vague movie description or id
 @app.get("/fetch_movies/", response_model=Dict[str, Any])
 def fetch_movies(keyword: str = Query(None, description="Keyword to search for movies"),
                 count: int = Query(10, description="Number of movies to fetch")):
-    """
-    Fetch movies from OMDb API by keyword
-    
-    If no keyword is provided, returns popular movies
-    """
+    """Search for movies by keyword or get popular ones"""
     if keyword:
         movies = fetch_movies_by_keyword(keyword, count)
         message = f"Found {len(movies)} movies matching '{keyword}'"
@@ -316,7 +297,7 @@ def fetch_movies(keyword: str = Query(None, description="Keyword to search for m
         movies = fetch_popular_movies()
         message = f"Fetched {len(movies)} popular movies"
     
-    # Return the movies directly without saving to database
+    # Just return results without saving
     if movies:
         return {
             "movies": movies,
@@ -328,7 +309,7 @@ def fetch_movies(keyword: str = Query(None, description="Keyword to search for m
         "message": "No movies found."
     }
 
-# Run the server when this file is executed directly
+# Start server when run directly
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -3,23 +3,14 @@ import json
 import os
 from typing import List, Dict, Any, Optional
 
-# OMDb API key from .env.local
-OMDB_API_KEY = "42d83121"  # This matches the key in frontend/.env.local
+# API credentials
+OMDB_API_KEY = "42d83121"  # API key for movie data
 
-# Base URL for OMDb API
+# API endpoint
 OMDB_BASE_URL = "http://www.omdbapi.com/"
 
 def search_movies(query: str, page: int = 1) -> Dict[str, Any]:
-    """
-    Search for movies using OMDb API
-    
-    Args:
-        query: Search query
-        page: Page number for results
-        
-    Returns:
-        Dictionary with search results
-    """
+    """Search for movies by title or keywords"""
     params = {
         "apikey": OMDB_API_KEY,
         "s": query,
@@ -42,16 +33,7 @@ def search_movies(query: str, page: int = 1) -> Dict[str, Any]:
         return {"Search": [], "totalResults": "0"}
 
 def get_movie_details(title: str, year: str = None) -> Dict[str, Any]:
-    """
-    Get detailed information about a movie
-    
-    Args:
-        title: Movie title
-        year: Optional release year to narrow search
-        
-    Returns:
-        Dictionary with movie details
-    """
+    """Get full movie information by title"""
     params = {
         "apikey": OMDB_API_KEY,
         "t": title,
@@ -76,15 +58,7 @@ def get_movie_details(title: str, year: str = None) -> Dict[str, Any]:
         return {}
 
 def get_movie_by_id(imdb_id: str) -> Dict[str, Any]:
-    """
-    Get movie details by IMDb ID
-    
-    Args:
-        imdb_id: IMDb ID (e.g., tt0111161)
-        
-    Returns:
-        Dictionary with movie details
-    """
+    """Fetch movie using its IMDb ID"""
     params = {
         "apikey": OMDB_API_KEY,
         "i": imdb_id,
@@ -106,16 +80,8 @@ def get_movie_by_id(imdb_id: str) -> Dict[str, Any]:
         return {}
 
 def format_movie_data(omdb_movie: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Format OMDb movie data to match our application's format
-    
-    Args:
-        omdb_movie: Movie data from OMDb API
-        
-    Returns:
-        Formatted movie data
-    """
-    # Extract rating
+    """Convert OMDb response to our app's format"""
+    # Parse rating value
     rating = 0.0
     if "imdbRating" in omdb_movie and omdb_movie["imdbRating"] != "N/A":
         try:
@@ -123,7 +89,7 @@ def format_movie_data(omdb_movie: Dict[str, Any]) -> Dict[str, Any]:
         except (ValueError, TypeError):
             rating = 0.0
     
-    # Format the data
+    # Structure the movie data
     return {
         "title": omdb_movie.get("Title", "Unknown Title"),
         "rating": rating,
@@ -138,16 +104,7 @@ def format_movie_data(omdb_movie: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 def fetch_movies_by_keyword(keyword: str, count: int = 10) -> List[Dict[str, Any]]:
-    """
-    Fetch movies from OMDb by keyword and format them for our application
-    
-    Args:
-        keyword: Search keyword
-        count: Maximum number of movies to fetch
-        
-    Returns:
-        List of formatted movie data
-    """
+    """Search and retrieve movies matching a keyword"""
     movies = []
     page = 1
     
@@ -162,7 +119,7 @@ def fetch_movies_by_keyword(keyword: str, count: int = 10) -> List[Dict[str, Any
             if len(movies) >= count:
                 break
                 
-            # Get detailed information for each movie
+            # Get complete details for each result
             if "imdbID" in result:
                 movie_details = get_movie_by_id(result["imdbID"])
                 if movie_details:
@@ -171,30 +128,20 @@ def fetch_movies_by_keyword(keyword: str, count: int = 10) -> List[Dict[str, Any
         
         page += 1
         
-        # Safety check to avoid infinite loops
+        # Prevent too many API calls
         if page > 5 or len(movies) >= count:
             break
     
     return movies
 
 def search_by_description(description: str, count: int = 10) -> List[Dict[str, Any]]:
-    """
-    Search for movies that match a vague description by extracting keywords
-    and searching OMDb API with improved keyword extraction
-    
-    Args:
-        description: Vague movie description
-        count: Maximum number of movies to fetch
-        
-    Returns:
-        List of formatted movie data
-    """
+    """Find movies that match a vague description or theme"""
     print(f"Searching for movies matching description: {description}")
     
-    # Extract potential keywords from the description
+    # Break description into words
     words = description.lower().split()
     
-    # Filter out common words
+    # Skip common words that don't help with search
     common_words = {
         "a", "an", "the", "and", "or", "but", "in", "on", "at", "to", "for", "with", 
         "about", "from", "by", "is", "are", "was", "were", "be", "been", "being", 
@@ -203,29 +150,29 @@ def search_by_description(description: str, count: int = 10) -> List[Dict[str, A
         "what", "where", "when", "why", "how", "movie", "film", "watch", "see", "like"
     }
     
-    # Extract keywords and phrases
+    # Find useful search terms
     keywords = []
     phrases = []
     
-    # Extract multi-word phrases (potential genres or themes)
+    # Look for meaningful two-word combinations
     if len(words) >= 2:
         for i in range(len(words) - 1):
             if words[i] not in common_words and words[i+1] not in common_words:
                 phrases.append(f"{words[i]} {words[i+1]}")
     
-    # Extract single keywords
+    # Keep meaningful single words
     keywords = [word for word in words if word not in common_words and len(word) > 2]
     
     print(f"Extracted keywords: {keywords}")
     print(f"Extracted phrases: {phrases}")
     
-    # Check for specific patterns in the description
+    # Start collecting results
     all_movies = []
     
-    # Pattern matching for common movie descriptions
+    # Look for specific movie themes
     description_lower = description.lower()
     
-    # Check for specific movie patterns
+    # Known movie patterns to check against
     movie_patterns = [
         {"keywords": ["boy", "boat", "tiger"], "title": "Life of Pi"},
         {"keywords": ["dream", "inception", "dreams", "within"], "title": "Inception"},
@@ -239,7 +186,7 @@ def search_by_description(description: str, count: int = 10) -> List[Dict[str, A
         {"keywords": ["dinosaur", "jurassic", "park"], "title": "Jurassic Park"}
     ]
     
-    # Check if description matches any specific movie pattern
+    # Try to match description to known movies
     for pattern in movie_patterns:
         if any(keyword in description_lower for keyword in pattern["keywords"]):
             movie_details = get_movie_details(pattern["title"])
@@ -247,7 +194,7 @@ def search_by_description(description: str, count: int = 10) -> List[Dict[str, A
                 formatted = format_movie_data(movie_details)
                 all_movies.append(formatted)
     
-    # Try searching with phrases first
+    # Search using two-word phrases
     if len(all_movies) < count and phrases:
         for phrase in phrases[:3]:  # Use top 3 phrases
             if len(all_movies) >= count:
@@ -255,26 +202,26 @@ def search_by_description(description: str, count: int = 10) -> List[Dict[str, A
                 
             movies = fetch_movies_by_keyword(phrase, count=3)
             
-            # Add only new movies
+            # Avoid duplicates
             existing_ids = {movie.get("imdb_id") for movie in all_movies}
             for movie in movies:
                 if movie.get("imdb_id") not in existing_ids and len(all_movies) < count:
                     all_movies.append(movie)
                     existing_ids.add(movie.get("imdb_id"))
     
-    # Try with combinations of keywords
+    # Try keyword combinations
     if len(all_movies) < count and len(keywords) >= 2:
         search_term = " ".join(keywords[:3])
         movies = fetch_movies_by_keyword(search_term, count=3)
         
-        # Add only new movies
+        # Keep track of what we've found
         existing_ids = {movie.get("imdb_id") for movie in all_movies}
         for movie in movies:
             if movie.get("imdb_id") not in existing_ids and len(all_movies) < count:
                 all_movies.append(movie)
                 existing_ids.add(movie.get("imdb_id"))
     
-    # If we still don't have enough movies, try with individual keywords
+    # Try individual keywords if needed
     if len(all_movies) < count:
         for keyword in keywords[:5]:  # Use top 5 keywords
             if len(all_movies) >= count:
@@ -282,18 +229,18 @@ def search_by_description(description: str, count: int = 10) -> List[Dict[str, A
                 
             movies = fetch_movies_by_keyword(keyword, count=2)
             
-            # Add only new movies
+            # Skip movies we already have
             existing_ids = {movie.get("imdb_id") for movie in all_movies}
             for movie in movies:
                 if movie.get("imdb_id") not in existing_ids and len(all_movies) < count:
                     all_movies.append(movie)
                     existing_ids.add(movie.get("imdb_id"))
     
-    # If we still don't have enough movies, add some popular ones
+    # Fill remaining slots with popular movies
     if len(all_movies) < count:
         popular_movies = fetch_popular_movies()
         
-        # Add only new movies
+        # Avoid duplicates
         existing_ids = {movie.get("imdb_id") for movie in all_movies}
         for movie in popular_movies:
             if movie.get("imdb_id") not in existing_ids and len(all_movies) < count:
@@ -303,15 +250,7 @@ def search_by_description(description: str, count: int = 10) -> List[Dict[str, A
     return all_movies[:count]  # Return only the requested number of movies
 
 def fetch_popular_movies() -> List[Dict[str, Any]]:
-    """
-    Fetch some popular movies as a fallback
-    
-    Since OMDb doesn't have a "popular movies" endpoint,
-    we'll use a predefined list of popular movie titles
-    
-    Returns:
-        List of formatted movie data
-    """
+    """Get a list of well-known movies as fallback"""
     popular_titles = [
         "The Shawshank Redemption",
         "The Godfather",

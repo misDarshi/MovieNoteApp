@@ -36,5 +36,5 @@ class Movie(BaseModel):
     director: str = ""
     actors: str = ""
     poster: str = ""
-    notes: Optional[str] = None  # Field for user's personal notes about the movie
-    user_id: Optional[str] = None  # Associate movies with users
+    notes: Optional[str] = None  # User's personal notes
+    user_id: Optional[str] = None  # Owner of this movie entry

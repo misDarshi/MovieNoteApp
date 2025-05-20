@@ -4,21 +4,16 @@ from typing import List, Dict, Any
 from vector_search import index_movies as create_vector_index
 
 def index_movies(movies: List[Dict[str, Any]]) -> None:
-    """
-    Index movies for vector search
-    
-    This function takes a list of movies and creates vector embeddings
-    for semantic search functionality.
-    """
+    """Index movies for vector search to enable semantic matching"""
     print(f"Indexing {len(movies)} movies...")
     
-    # Create vector embeddings for semantic search
+    # Pass to vector search module for embedding creation
     create_vector_index(movies)
     
     print("Indexing complete!")
 
 if __name__ == "__main__":
-    # If run directly, index all movies in the movies.json file
+    # When run as a script, index all movies from the local database
     if os.path.exists("movies.json"):
         with open("movies.json", "r") as f:
             movies = json.load(f)

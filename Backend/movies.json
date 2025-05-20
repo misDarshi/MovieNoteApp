@@ -8,7 +8,8 @@
     "year": "2012",
     "director": "Anurag Basu",
     "actors": "Ranbir Kapoor, Priyanka Chopra Jonas, Ileana D'Cruz",
-    "poster": "https://m.media-amazon.com/images/M/MV5BMTQzMTEyODY2Ml5BMl5BanBnXkFtZTgwMjA0MDUyMjE@._V1_SX300.jpg"
+    "poster": "https://m.media-amazon.com/images/M/MV5BMTQzMTEyODY2Ml5BMl5BanBnXkFtZTgwMjA0MDUyMjE@._V1_SX300.jpg",
+    "notes": null
   },
   {
     "title": "Life of Pi",
@@ -19,6 +20,19 @@
     "year": "2012",
     "director": "Ang Lee",
     "actors": "Suraj Sharma, Irrfan Khan, Adil Hussain",
-    "poster": "https://m.media-amazon.com/images/M/MV5BNTg2OTY2ODg5OF5BMl5BanBnXkFtZTcwODM5MTYxOA@@._V1_SX300.jpg"
+    "poster": "https://m.media-amazon.com/images/M/MV5BNTg2OTY2ODg5OF5BMl5BanBnXkFtZTcwODM5MTYxOA@@._V1_SX300.jpg",
+    "notes": null
+  },
+  {
+    "title": "Fan",
+    "rating": 6.8,
+    "description": "Gaurav a boy from Delhi is a die hard fan of Bollywood superstar Aryan Khanna. He comes to Mumbai to wish his idol on his Birthday, but over there things got worst and Gaurav's obsession turned himself a man who wants to create chaos in Aryan Khanna's life.",
+    "watched": false,
+    "genre": "Action, Drama, Thriller",
+    "year": "2016",
+    "director": "Maneesh Sharma",
+    "actors": "Shah Rukh Khan, Shriya Pilgaonkar, Sayani Gupta",
+    "poster": "https://m.media-amazon.com/images/M/MV5BNWFjOTA3NzQtODUzNS00MWRlLWE5Y2YtNmMyZjU3YzkxYzI4XkEyXkFqcGc@._V1_SX300.jpg",
+    "notes": null
   }
 ]

@@ -1,4 +1,4 @@
-// components/VagueSearchForm.tsx
+// Form for finding movies by description
 'use client';
 
 import { useState } from 'react';

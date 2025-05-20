@@ -5,27 +5,27 @@ from datetime import datetime
 from typing import List, Dict, Any, Optional
 from passlib.context import CryptContext
 
-# Constants
+# Storage locations
 USERS_FILE = "users.json"
 USER_MOVIES_DIR = "user_movies"
 
-# Password hashing
+# Security setup
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def load_users():
-    """Load all users from the JSON file"""
+    """Read user accounts from storage"""
     if os.path.exists(USERS_FILE):
         with open(USERS_FILE, "r") as f:
             return json.load(f)
     return []
 
 def save_users(users):
-    """Save all users to the JSON file"""
+    """Write user accounts to storage"""
     with open(USERS_FILE, "w") as f:
         json.dump(users, f, indent=2)
 
 def get_user(username: str):
-    """Get a user by username"""
+    """Find user account by username"""
     users = load_users()
     for user in users:
         if user["username"] == username:
@@ -33,7 +33,7 @@ def get_user(username: str):
     return None
 
 def get_user_by_id(user_id: str):
-    """Get a user by ID"""
+    """Find user account by ID"""
     users = load_users()
     for user in users:
         if user["id"] == user_id:
@@ -41,25 +41,25 @@ def get_user_by_id(user_id: str):
     return None
 
 def verify_password(plain_password, hashed_password):
-    """Verify a password against a hash"""
+    """Check if password is correct"""
     return pwd_context.verify(plain_password, hashed_password)
 
 def get_password_hash(password):
-    """Hash a password"""
+    """Securely hash a password"""
     return pwd_context.hash(password)
 
 def create_user(email: str, username: str, password: str):
-    """Create a new user"""
+    """Register a new user account"""
     users = load_users()
     
-    # Check if username or email already exists
+    # Prevent duplicate accounts
     for user in users:
         if user["username"] == username:
             return {"error": "Username already registered"}
         if user["email"] == email:
             return {"error": "Email already registered"}
     
-    # Create new user
+    # Set up new account
     user_id = str(uuid.uuid4())
     hashed_password = get_password_hash(password)
     
@@ -74,10 +74,10 @@ def create_user(email: str, username: str, password: str):
     users.append(new_user)
     save_users(users)
     
-    # Create user's movie directory
+    # Set up storage for user's movies
     ensure_user_movies_dir(user_id)
     
-    # Return user without hashed_password
+    # Return safe user data
     return {
         "id": user_id,
         "email": email,
@@ -86,7 +86,7 @@ def create_user(email: str, username: str, password: str):
     }
 
 def ensure_user_movies_dir(user_id: str):
-    """Ensure the user's movie directory exists"""
+    """Create user's movie storage if needed"""
     if not os.path.exists(USER_MOVIES_DIR):
         os.makedirs(USER_MOVIES_DIR)
     
@@ -100,7 +100,7 @@ def ensure_user_movies_dir(user_id: str):
             json.dump([], f)
 
 def get_user_movies(user_id: str) -> List[Dict[str, Any]]:
-    """Get movies for a specific user"""
+    """Load user's movie collection"""
     user_movies_file = os.path.join(USER_MOVIES_DIR, user_id, "movies.json")
     if os.path.exists(user_movies_file):
         with open(user_movies_file, "r") as f:
@@ -108,34 +108,34 @@ def get_user_movies(user_id: str) -> List[Dict[str, Any]]:
     return []
 
 def add_user_movie(user_id: str, movie_data: Dict[str, Any]) -> Dict[str, Any]:
-    """Add a movie to a user's collection"""
+    """Save a movie to user's collection"""
     movies = get_user_movies(user_id)
     
-    # Check for duplicates
+    # Handle duplicate movies
     duplicate = any(movie["title"].lower() == movie_data["title"].lower() for movie in movies)
     
     if duplicate:
-        # Update existing movie
+        # Update existing entry
         for i, movie in enumerate(movies):
             if movie["title"].lower() == movie_data["title"].lower():
                 movies[i].update(movie_data)
                 save_user_movies(user_id, movies)
                 return movies[i]
     
-    # Add the movie
+    # Add new movie
     movies.append(movie_data)
     save_user_movies(user_id, movies)
     return movie_data
 
 def save_user_movies(user_id: str, movies: List[Dict[str, Any]]):
-    """Save a user's movies"""
+    """Write movie collection to storage"""
     ensure_user_movies_dir(user_id)
     user_movies_file = os.path.join(USER_MOVIES_DIR, user_id, "movies.json")
     with open(user_movies_file, "w") as f:
         json.dump(movies, f, indent=2)
 
 def update_user_movie(user_id: str, movie_title: str, update_data: Dict[str, Any]) -> Dict[str, Any]:
-    """Update a movie in a user's collection"""
+    """Modify a movie in user's collection"""
     movies = get_user_movies(user_id)
     
     for i, movie in enumerate(movies):
@@ -147,7 +147,7 @@ def update_user_movie(user_id: str, movie_title: str, update_data: Dict[str, Any
     return {"error": "Movie not found"}
 
 def delete_user_movie(user_id: str, movie_title: str) -> Dict[str, Any]:
-    """Delete a movie from a user's collection"""
+    """Remove a movie from user's collection"""
     movies = get_user_movies(user_id)
     
     for i, movie in enumerate(movies):

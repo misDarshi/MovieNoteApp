@@ -5,14 +5,14 @@ export async function GET(req: Request) {
   const title = searchParams.get('title');
   const search = searchParams.get('search');
   
-  // Handle search parameter for movie search functionality
+  // Movie search functionality
   if (search) {
     try {
-      // Call OMDB API to search for movies
+      // Search OMDB database
       const omdbApiKey = "42d83121"; // Same key used in backend
       const apiUrl = `http://www.omdbapi.com/?apikey=${omdbApiKey}&s=${encodeURIComponent(search)}&type=movie`;
       
-      console.log(`📡 Searching movies with query: ${search}`);
+      console.log(`Searching movies with query: ${search}`);
       const response = await fetch(apiUrl);
       
       if (!response.ok) {
@@ -33,7 +33,7 @@ export async function GET(req: Request) {
       
       return NextResponse.json(data.Search || []);
     } catch (error) {
-      console.error('❌ Error searching movies:', error);
+      console.error('Error searching movies:', error);
       return NextResponse.json(
         { error: 'Failed to search movies' },
         { status: 500 }
@@ -41,7 +41,7 @@ export async function GET(req: Request) {
     }
   }
   
-  // Handle title parameter for adding a movie
+  // Add movie by title
   if (!title) {
     return NextResponse.json(
       { error: 'Title or search parameter is required' },
@@ -50,11 +50,11 @@ export async function GET(req: Request) {
   }
 
   try {
-    // First, get movie details from OMDB API
+    // Get movie details from OMDB
     const omdbApiKey = "42d83121"; // Same key used in backend
     const omdbUrl = `http://www.omdbapi.com/?apikey=${omdbApiKey}&t=${encodeURIComponent(title)}&plot=full`;
     
-    console.log(`📡 Fetching movie details from OMDB: ${omdbUrl}`);
+    console.log(`Fetching movie details from OMDB: ${omdbUrl}`);
     const omdbResponse = await fetch(omdbUrl);
     
     if (!omdbResponse.ok) {
@@ -73,7 +73,7 @@ export async function GET(req: Request) {
       );
     }
     
-    // Format the OMDB data
+    // Extract relevant movie info
     const movieDetails = {
       title: omdbData.Title,
       year: omdbData.Year,
@@ -87,17 +87,16 @@ export async function GET(req: Request) {
       imdbID: omdbData.imdbID
     };
     
-    // Call the backend API to add the movie (use guest endpoint)
+    // Add to backend database
     const backendUrl = process.env.BACKEND_URL || 'http://localhost:8000';
     const apiUrl = `${backendUrl}/add_movie_guest/?movie_name=${encodeURIComponent(title)}`;
     
-    console.log(`📡 Calling backend API to add movie: ${apiUrl}`);
+    console.log(`Adding movie to database: ${apiUrl}`);
     const response = await fetch(apiUrl, {
       method: 'POST', // Use POST method as required by the backend
     });
     
-    // Even if the backend returns an error (e.g., movie already exists),
-    // we still want to return the movie details to the frontend
+    // Return movie details even if backend has issues
     if (!response.ok) {
       console.log(`Backend API returned status ${response.status}, but continuing with movie details`);
       return NextResponse.json(movieDetails);
@@ -105,10 +104,10 @@ export async function GET(req: Request) {
     
     const data = await response.json();
     
-    // Return the movie details from OMDB, not the backend response
+    // Use OMDB data for consistent response format
     return NextResponse.json(movieDetails);
   } catch (error) {
-    console.error('❌ Error calling backend API:', error);
+    console.error('Error calling backend API:', error);
     return NextResponse.json(
       { error: 'Failed to add movie' },
       { status: 500 }
@@ -116,7 +115,7 @@ export async function GET(req: Request) {
   }
 }
 
-// Add POST method to handle direct POST requests
+// Handle direct movie addition requests
 export async function POST(req: Request) {
   const { searchParams } = new URL(req.url);
   const title = searchParams.get('title');
@@ -129,18 +128,18 @@ export async function POST(req: Request) {
   }
 
   try {
-    // Call the backend API to add the movie (use guest endpoint)
+    // Add movie to database
     const backendUrl = process.env.BACKEND_URL || 'http://localhost:8000';
     const apiUrl = `${backendUrl}/add_movie_guest/?movie_name=${encodeURIComponent(title)}`;
     
-    console.log(`📡 Calling backend API to add movie (POST): ${apiUrl}`);
+    console.log(`Adding movie (POST): ${apiUrl}`);
     const response = await fetch(apiUrl, {
       method: 'POST',
     });
     
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`❌ Backend API error: ${response.status} - ${errorText}`);
+      console.error(`Backend API error: ${response.status} - ${errorText}`);
       return NextResponse.json(
         { error: `Backend API error: ${response.status}` },
         { status: response.status }
@@ -158,7 +157,7 @@ export async function POST(req: Request) {
     
     return NextResponse.json(data.movie || data);
   } catch (error) {
-    console.error('❌ Error calling backend API:', error);
+    console.error('Error calling backend API:', error);
     return NextResponse.json(
       { error: 'Failed to add movie' },
       { status: 500 }
@@ -178,18 +177,18 @@ export async function DELETE(req: Request) {
   }
 
   try {
-    // Call the backend API to delete the movie (use guest endpoint)
+    // Remove movie from database
     const backendUrl = process.env.BACKEND_URL || 'http://localhost:8000';
     const apiUrl = `${backendUrl}/delete_movie_guest/?movie_name=${encodeURIComponent(title)}`;
     
-    console.log(`📡 Calling backend API to delete movie: ${apiUrl}`);
+    console.log(`Deleting movie: ${apiUrl}`);
     const response = await fetch(apiUrl, {
       method: 'DELETE',
     });
     
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`❌ Backend API error: ${response.status} - ${errorText}`);
+      console.error(`Backend API error: ${response.status} - ${errorText}`);
       return NextResponse.json(
         { error: `Backend API error: ${response.status}` },
         { status: response.status }
@@ -207,7 +206,7 @@ export async function DELETE(req: Request) {
     
     return NextResponse.json(data);
   } catch (error) {
-    console.error('❌ Error calling backend API:', error);
+    console.error('Error calling backend API:', error);
     return NextResponse.json(
       { error: 'Failed to delete movie' },
       { status: 500 }
